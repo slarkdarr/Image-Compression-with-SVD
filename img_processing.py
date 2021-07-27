@@ -61,3 +61,58 @@ def svd(A, k=None, epsilon=1e-10):
 
     singular_values, us, vs = [np.array(x) for x in zip(*svd_so_far)]
     return us.T, singular_values, vs
+
+def compress_img(img, k):
+    # Membagi array menjadi tiga buah array 2 dimensi
+    r = img[:,:,0]  # array untuk R
+    g = img[:,:,1]  # array untuk G
+    b = img[:,:,2] # array untuk B
+    
+    print("Mengompresi gambar...")
+    
+    # Hitung komponen svd dari ketiga array di atas
+    ur,sr,vr = svd(r,k=k)
+    ug,sg,vg = svd(g,k=k)
+    ub,sb,vb = svd(b,k=k)
+    
+    # Proses pembentukan compressed image dengan informasi yang lebih sedikit
+
+    # Kita hanya akan memilih sejumlah k singular value dari setiap array untuk membuat suatu gambar yang
+    # meng-exclude beberapa informasi dari gambar asli dengan dimensi yang sama
+    
+    # ur (mxk), diag(sr)(kxk) dan vr (kxn) if image is off (mxn)
+    # Asumsikan kita hanya memilih k1 singular value dari diag(sr) untuk membentuk gambar kompresi
+    
+    rr = np.dot(ur[:,:k],np.dot(np.diag(sr[:k]), vr[:k,:]))
+    rg = np.dot(ug[:,:k],np.dot(np.diag(sg[:k]), vg[:k,:]))
+    rb = np.dot(ub[:,:k],np.dot(np.diag(sb[:k]), vb[:k,:]))
+    
+    print("Menyusun gambar hasil kompresi...")
+    
+    # Membuat array berisi nol yang dimensinya sama seperti matriks gambar asli
+    rimg = np.zeros(img.shape)
+    
+    # Tambahkan matriks untuk r, g, dan b pada array yang telah dibuat
+    rimg[:,:,0] = rr
+    rimg[:,:,1] = rg
+    rimg[:,:,2] = rb
+    
+    # Jika ada sebuah nilai yang lebih kecil dari 0, nilai tersebut akan dikonversi menjadi nilai mutlaknya
+    # Jika ada nilai yang lebih besar dari 255, nilai tersebut akan dikonversi ke 255
+    # Hal ini dilakukan karena array uint8 hanya mempunyai nilai antara 0 dan 255
+    for ind1, row in enumerate(rimg):
+        for ind2, col in enumerate(row):
+            for ind3, value in enumerate(col):
+                if value < 0:
+                    rimg[ind1,ind2,ind3] = abs(value)
+                if value > 255:
+                    rimg[ind1,ind2,ind3] = 255
+
+    # Konversi array gambar yang telah dikompresi menjadi tipe uint8
+    # agar dapat diubah nantinya menjadi objek gambar
+    compressed_image = rimg.astype(np.uint8)
+
+    # Konversi array menjadi objek gambar
+    compressed_image = Image.fromarray(compressed_image)
+
+    return compressed_image
