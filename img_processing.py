@@ -63,6 +63,7 @@ def svd(A, k=None, epsilon=1e-10):
     return us.T, singular_values, vs
 
 def compress_img(img, k):
+    print("Memproses...")
     # Membagi array menjadi tiga buah array 2 dimensi
     r = img[:,:,0]  # array untuk R
     g = img[:,:,1]  # array untuk G
