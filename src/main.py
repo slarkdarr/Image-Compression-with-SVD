@@ -4,7 +4,7 @@ import os
 
 from PIL import Image
 from svd_img_processing import compress_img
-from huffman_coding import huffman_coding
+# from huffman_coding import huffman_coding
 
 directory = str(input("Masukkan path file : "))
 
@@ -13,7 +13,7 @@ image = Image.open(directory)
 base = os.path.basename(image.filename)
 filename = os.path.splitext(base)[0]
 
-image.save(f'in\{filename}.jpg')
+image.save(f'..\in\{filename}.jpg')
 image_array = np.asarray(image)
 
 # print("""
@@ -58,10 +58,10 @@ end = time.time()
 
 #     end = time.time()
 
-compressed_image.save(f'out\{filename}_compressed.jpg')
+compressed_image.save(f'..\out\{filename}_compressed.jpg')
 
-original_size = os.path.getsize(f'in\{filename}.jpg')
-compressed_size = os.path.getsize(f'out\{filename}_compressed.jpg')
+original_size = os.path.getsize(f'..\in\{filename}.jpg')
+compressed_size = os.path.getsize(f'..\out\{filename}_compressed.jpg')
 
 print(f'\nRuntime program : {end-start:.2f} sekon')
 print(f'Ukuran gambar original : {original_size} byte')
